@@ -20,11 +20,12 @@ I have also added some quality-of-life features. Apart from those, I have kept t
 
 You can update directly from the official 4.4 or 5.1 firmware. I recommend using the check app, because it confirms that the tablet's hardware version is correct for this image before anything is installed.
 
-1. Copy the image file (`.img`) to the top level of the SD card and put the card in the tablet.
-2. Install the check app (`APPC-10DSQ-Check.apk`) on the tablet and open it.
-3. The app checks the hardware version and then starts the update from the image on the SD card.
+1. **Download** the image you want and the check app (`APPC-10DSQ-Check.apk`) from the [latest release](https://github.com/Chrisb003/APPC-10DSQPL-Andriod7.1/releases/latest).
+2. Copy the image file (`.img`) to the top level of the SD card and put the card in the tablet.
+3. Install the check app on the tablet and open it.
+4. The app checks the hardware version and then starts the update from the image on the SD card.
 
-There are two images:
+There are two images (`MD5SUMS.txt` in the release lets you check your download):
 
 | Image | Contents |
 |---|---|
