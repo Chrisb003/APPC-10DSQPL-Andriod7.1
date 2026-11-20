@@ -3,7 +3,7 @@
 > [!IMPORTANT]
 > **Unofficial firmware.** This is not an official ProDVX image. It is something I have put together myself.
 
-**Version:** N1.9, the latest stable version.
+**Version:** N1.9.1, the latest stable version.
 
 **Tested on:** APPC-10DSQPL hardware version 1.1, both the PoE/LED model and the model without PoE and LEDs.
 
@@ -29,8 +29,8 @@ There are two images (`MD5SUMS.txt` in the release lets you check your download)
 
 | Image | Contents |
 |---|---|
-| `update7.1.V1.1.N1.9.Gapps.img` | Standard: Google Play Store, Play services and Chrome |
-| `update7.1.V1.1.N1.9.NoGapps.img` | No Google apps: no Google software at all, with a simple web browser instead |
+| `update7.1.V1.1.N1.9.1.Gapps.img` | Standard: Google Play Store, Play services and Chrome |
+| `update7.1.V1.1.N1.9.1.NoGapps.img` | No Google apps: no Google software at all, with a simple web browser instead |
 
 ## What has changed
 
@@ -65,6 +65,7 @@ The changes fall into two groups:
 - **USB-A port:** now powered (it had no power on the car image).
 - **SD card:** shown as "SD card" (the car image called it "GPS", its map card).
 - **Display:** brightness no longer drops to minimum, the lowest setting no longer turns the backlight off, and tablets with a different screen panel display correctly.
+- **Memory speed:** 456 MHz, as on the official 5.1 image.
 - **HDMI out:** 1080p by default.
 
 ### Security
