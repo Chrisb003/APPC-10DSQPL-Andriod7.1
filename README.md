@@ -159,7 +159,7 @@ The extra Settings screens from the official images are carried over and extende
 
 ### Web dashboard (new)
 
-Runs as a Mac app, or with Python on a Mac, Windows PC, Linux computer or Raspberry Pi. Like the rest of remote management, it only reaches tablets on the same network as the computer it runs on.
+Runs with Python on a Windows PC, Mac, Linux computer or Raspberry Pi, and is used from a web browser. Like the rest of remote management, it only reaches tablets on the same network as the computer it runs on.
 
 **Get it:** download `APPC-Tablet-Dashboard-Python-0.4.zip` from the [dashboard release](https://github.com/Chrisb003/APPC-10DSQPL-Andriod7.1/releases/tag/dashboard-0.4). Install and use instructions for Windows, Mac and Linux are in the [dashboard folder](APPC-Tablet-Dashboard-Python-0.4/).
 
@@ -177,9 +177,7 @@ Runs as a Mac app, or with Python on a Mac, Windows PC, Linux computer or Raspbe
 - **Server:**
   - login, and HTTPS with its own certificate;
   - changeable port, moving to the next free port if the chosen one is in use.
-- **Mac app:**
-  - menu bar icon and Open at Login;
-  - progress bars for uploads and app installs.
+- **Progress bars** for uploads and app installs.
 
 ### Panel test app (new)
 

@@ -74,8 +74,6 @@ When you later allow other computers to use the dashboard, Windows asks whether 
 3. **Start it:** double-click `start-dashboard-mac.command`. A Terminal window opens; keep it open while you use the dashboard. The first time, macOS may refuse to open it because it was downloaded: go to **System Settings › Privacy & Security**, click **Open Anyway** next to its name, then double-click it again. (Or start it from Terminal: `cd` into the folder and run `python3 appc_dashboard.py`.)
 4. **Open** http://127.0.0.1:8080/ in your browser.
 
-There is also a Mac app version of the dashboard, with a menu bar icon and Open at Login. This Python version does the same on its own.
-
 ### Linux and Raspberry Pi
 
 1. **Install Python and adb.**
@@ -184,7 +182,7 @@ journalctl -u appc-dashboard | grep "setup code"
 
 **Windows.** Press Win+R, type `shell:startup` and press Enter. Put a shortcut to `start-dashboard-windows.bat` in the folder that opens. The dashboard then starts when you sign in to Windows.
 
-**Mac.** Add `start-dashboard-mac.command` under **System Settings › General › Login Items**, or use the Mac app version, which has **Open at Login**.
+**Mac.** Add `start-dashboard-mac.command` under **System Settings › General › Login Items**.
 
 ## Command-line options
 
