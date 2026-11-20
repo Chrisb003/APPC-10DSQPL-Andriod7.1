@@ -149,6 +149,9 @@ The extra Settings screens from the official images are carried over and extende
 
 ### Remote management
 
+> [!NOTE]
+> **Remote management only works with tablets on the same network as the computer managing them.** The dashboard and network debugging connect to each tablet directly over the local network; they cannot reach tablets over the internet. To manage tablets at another site, that computer must be on the site's network, for example through a VPN that connects the two networks.
+
 - **Network debugging (adb) is on by default** on port 5555, as on the official images, and each computer must be approved on the tablet the first time. New: it can be switched off in Developer options › Network debugging.
 - **"Allow new computers to ask"** switches for network and USB, and a list of refused computers. The "USB debugging connected" notification can be turned off.
 - **Remote management** switch, **off by default**. The web dashboard needs it on; while it is off, a dashboard can only see whether the tablet is online.
@@ -156,7 +159,7 @@ The extra Settings screens from the official images are carried over and extende
 
 ### Web dashboard (new)
 
-Runs as a Mac app, or with Python on a Mac, Windows PC or Raspberry Pi.
+Runs as a Mac app, or with Python on a Mac, Windows PC, Linux computer or Raspberry Pi. Like the rest of remote management, it only reaches tablets on the same network as the computer it runs on.
 
 - **Tablets:**
   - status and screenshots;
