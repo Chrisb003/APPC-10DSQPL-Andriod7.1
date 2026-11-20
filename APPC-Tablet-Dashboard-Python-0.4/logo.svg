@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- APPC Tablet Dashboard logo: a tablet showing a dashboard (status lights + a rising chart),
+       with signal arcs for the network link to the dashboard server. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2F6BFF"/>
+      <stop offset="1" stop-color="#0B2A6F"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.18"/>
+      <stop offset="0.5" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#14254D"/>
+      <stop offset="1" stop-color="#0A1633"/>
+    </linearGradient>
+    <linearGradient id="bar" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#14C8B4"/>
+      <stop offset="1" stop-color="#5BE7D6"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%">
+      <feDropShadow dx="0" dy="18" stdDeviation="22" flood-color="#000814" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- tile -->
+  <rect x="100" y="100" width="824" height="824" rx="186" fill="url(#bg)"/>
+  <rect x="100" y="100" width="824" height="824" rx="186" fill="url(#shine)"/>
+
+  <!-- signal arcs above the tablet's top-right corner (the network link to the server) -->
+  <g fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-width="28">
+    <path d="M 760 232 A 68 68 0 0 1 828 300"/>
+    <path d="M 760 172 A 128 128 0 0 1 888 300" stroke="#AFC8FF"/>
+  </g>
+  <circle cx="768" cy="292" r="20" fill="#FFFFFF"/>
+
+  <!-- tablet -->
+  <g filter="url(#shadow)">
+    <rect x="196" y="344" width="632" height="420" rx="56" fill="#F4F7FC"/>
+  </g>
+  <rect x="236" y="384" width="552" height="340" rx="22" fill="url(#screen)"/>
+
+  <!-- dashboard on the screen: three status lights and a title bar -->
+  <circle cx="288" cy="432" r="18" fill="#34D399"/>
+  <circle cx="344" cy="432" r="18" fill="#34D399"/>
+  <circle cx="400" cy="432" r="18" fill="#FBBF24"/>
+  <rect x="448" y="423" width="288" height="18" rx="9" fill="#FFFFFF" fill-opacity="0.22"/>
+
+  <!-- and a rising chart -->
+  <rect x="327" y="606" width="70" height="80" rx="12" fill="url(#bar)"/>
+  <rect x="427" y="566" width="70" height="120" rx="12" fill="url(#bar)"/>
+  <rect x="527" y="526" width="70" height="160" rx="12" fill="url(#bar)"/>
+  <rect x="627" y="496" width="70" height="190" rx="12" fill="url(#bar)" fill-opacity="0.55"/>
+  <path d="M 362 576 L 462 536 L 562 496 L 662 468" fill="none" stroke="#FFFFFF" stroke-width="10"
+        stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.9"/>
+  <circle cx="662" cy="468" r="14" fill="#FFFFFF"/>
+</svg>

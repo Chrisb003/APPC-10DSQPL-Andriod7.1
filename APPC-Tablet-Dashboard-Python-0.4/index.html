@@ -1,0 +1,1005 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tablet Dashboard</title>
+<link rel="icon" href="/logo.svg" type="image/svg+xml">
+<style>
+:root {
+  --bg: #f4f5f7; --card: #fff; --text: #1d2330; --muted: #677085; --line: #dfe3ea;
+  --accent: #2563eb; --accent-text: #fff; --ok: #15803d; --warn: #b45309; --bad: #b91c1c; --chip: #eef1f6;
+  --shadow: 0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #11151c; --card: #1a202a; --text: #e6e9ef; --muted: #98a2b3; --line: #2b3340;
+    --accent: #4f8cff; --ok: #4ade80; --warn: #fbbf24; --bad: #f87171; --chip: #232b37; --shadow: none; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; font: 14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); }
+header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 14px 20px; background: var(--card); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 5; }
+h1 { font-size: 18px; margin: 0; }
+h2 { font-size: 15px; margin: 0 0 10px; }
+h3 { font-size: 13px; margin: 18px 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+main { max-width: 1200px; margin: 0 auto; padding: 16px; }
+button, select, input { font: inherit; color: inherit; }
+a { color: var(--accent); }
+a > button { color: var(--text); }
+table.files td.act, table.files th.act { width: 1%; padding-left: 3px; padding-right: 3px; }
+.fbtn { width: 96px; text-align: center; }
+.nowrap { white-space: nowrap; }
+button { border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+button:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+button.danger { color: var(--bad); }
+button:disabled { opacity: .5; cursor: default; }
+input, select { border: 1px solid var(--line); background: var(--card); border-radius: 8px; padding: 5px 8px; }
+input[type=checkbox] { padding: 0; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 12px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; box-shadow: var(--shadow); }
+.tablet { cursor: pointer; }
+.tablet.sel { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+.tablet .name { font-weight: 600; font-size: 15px; }
+.muted { color: var(--muted); }
+.small { font-size: 12px; }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; background: var(--chip); }
+.pill.ok { color: var(--ok); } .pill.warn { color: var(--warn); } .pill.bad { color: var(--bad); }
+details summary { cursor: pointer; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 2px 10px; margin-top: 8px; font-size: 13px; }
+.kv div:nth-child(odd) { color: var(--muted); }
+.bar { height: 6px; background: var(--chip); border-radius: 3px; overflow: hidden; margin-top: 3px; }
+.bar i { display: block; height: 100%; background: var(--accent); }
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 14px 0; overflow-x: auto; }
+.tabs button { border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: none; padding: 8px 12px; white-space: nowrap; }
+.tabs button.on { border-bottom-color: var(--accent); color: var(--accent); font-weight: 600; }
+table { border-collapse: collapse; width: 100%; }
+th, td { text-align: left; padding: 6px 6px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+th { font-size: 12px; color: var(--muted); font-weight: 600; }
+.days label { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 26px; border: 1px solid var(--line); border-radius: 6px; margin-right: 2px; font-size: 12px; cursor: pointer; user-select: none; }
+.days input { display: none; }
+.days input:checked + span { color: var(--accent-text); }
+.days label:has(input:checked) { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+.chip { display: inline-flex; gap: 6px; align-items: center; background: var(--chip); border-radius: 999px; padding: 3px 4px 3px 10px; margin: 0 6px 6px 0; }
+.chip button { padding: 0 7px; border-radius: 999px; }
+.preview .day { display: grid; grid-template-columns: 130px 1fr; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--line); }
+.ev { display: inline-block; margin: 0 8px 2px 0; }
+.ev.screen_on { color: var(--ok); } .ev.screen_off { color: var(--muted); } .ev.shutdown, .ev.reboot { color: var(--bad); }
+.note { background: var(--chip); border-radius: 8px; padding: 8px 10px; font-size: 13px; }
+.toast { position: fixed; right: 16px; bottom: 16px; max-width: 420px; padding: 10px 14px; border-radius: 10px; background: var(--text); color: var(--bg); box-shadow: var(--shadow); z-index: 20; }
+.toast.err { background: var(--bad); color: #fff; }
+img.shot { max-width: 100%; border: 1px solid var(--line); border-radius: 8px; }
+.scroll { overflow-x: auto; }
+@media (max-width: 600px) { header { padding: 12px 16px; } main { padding: 12px 16px; } .preview .day { grid-template-columns: 1fr; gap: 2px; } }
+/* progress of uploads and installs (bottom left; toasts are bottom right) */
+#activity { position: fixed; left: 16px; bottom: 16px; width: min(380px, calc(100vw - 32px)); display: flex; flex-direction: column; gap: 8px; z-index: 19; }
+.act { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; box-shadow: var(--shadow); }
+.act-row { display: flex; justify-content: space-between; gap: 10px; }
+.act-label { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bar { height: 6px; background: var(--chip); border-radius: 3px; overflow: hidden; margin: 7px 0 5px; position: relative; }
+.bar > div { height: 100%; width: 0; background: var(--accent); border-radius: 3px; transition: width .3s; }
+.act.indet .bar > div { width: 30%; position: absolute; animation: indet 1.3s infinite ease-in-out; transition: none; }
+@keyframes indet { 0% { left: -30%; } 100% { left: 100%; } }
+.act.ok .bar > div { background: var(--ok); } .act.bad .bar > div { background: var(--bad); }
+</style>
+</head>
+<body>
+<header>
+  <h1 style="display:flex; align-items:center; gap:10px"><img src="/logo.svg" alt="" width="34" height="34">Tablet Dashboard</h1>
+  <div class="row">
+    <input id="newName" placeholder="Name" size="12">
+    <input id="newAddr" placeholder="IP address (e.g. 10.0.0.52)" size="22">
+    <button class="primary" onclick="addTablet()">Add tablet</button>
+    <button onclick="refreshAll(this)">Refresh all</button>
+    <button onclick="toggleSettings()">Settings</button>
+    <span id="who" class="muted small"></span>
+  </div>
+</header>
+<main>
+  <div id="settings"></div>
+  <div id="tablets" class="grid"></div>
+  <div id="detail"></div>
+  <section class="card" style="margin-top:16px">
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">Tablets on USB</h2><button onclick="loadUsb(this)">Look again</button></div>
+    <p class="muted small">A tablet plugged into this computer's USB port can be set up for the network in one go: remote management and network debugging are switched on, this computer is allowed on the tablet for good (no "Allow debugging?" when it connects over the network), and the tablet is added to the list by its network address. Needs firmware N1.7.</p>
+    <div id="usb"><p class="muted small">Looking…</p></div>
+    <div id="usbResult"></div>
+  </section>
+  <section class="card" style="margin-top:16px">
+    <h2>APK library</h2>
+    <p class="muted small" style="margin-top:0">Upload an APK once, then install it on one or more tablets (existing apps are updated, their data is kept).</p>
+    <div class="row"><input type="file" id="apkFile" accept=".apk"><button onclick="uploadApk(this)">Upload</button></div>
+    <div id="apks" style="margin-top:10px"></div>
+  </section>
+  <section class="card" style="margin-top:16px">
+    <h2>Firmware</h2>
+    <p class="muted small" style="margin-top:0">Upload a firmware image once, then install it on one or more tablets at the same time. Each tablet needs its SD card in: the image is copied to the card, checked, and installed from there. (Images can also be copied straight into the "firmware" folder of the dashboard's data folder.)</p>
+    <div class="row"><input type="file" id="fwFile" accept=".img"><button onclick="uploadFw(this)">Upload</button><span id="fwUp" class="muted small"></span></div>
+    <div id="fwList" style="margin-top:10px"></div>
+    <div id="jobs"></div>
+  </section>
+</main>
+<script>
+// "Shut down" is never offered here (a tablet cannot switch itself back on); shut-down times set on the
+// tablet itself are shown read-only and kept
+const ACTIONS = [["screen_off","Screen off"],["screen_on","Screen on"],["reboot","Restart"]];
+const ALABEL = Object.assign(Object.fromEntries(ACTIONS), {shutdown: "Shut down"});
+const WEEK = [[2,"Mon"],[3,"Tue"],[4,"Wed"],[5,"Thu"],[6,"Fri"],[7,"Sat"],[1,"Sun"]];   // Calendar.DAY_OF_WEEK
+let list = [], sel = null, tab = "overview", pstate = {}, sched = null, apks = [], lastShot = null, shotTime = null, shotTimer = null, fs = {root: "internal", path: ""};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function toast(msg, err) {
+  const t = document.createElement("div"); t.className = "toast" + (err ? " err" : ""); t.textContent = msg;
+  document.body.appendChild(t); setTimeout(() => t.remove(), err ? 7000 : 3500);
+}
+async function api(path, opt = {}) {
+  opt.headers = Object.assign({"X-APPC": "1"}, opt.headers || {});
+  const r = await fetch("/api/" + path, opt);
+  if (r.status === 401) { location.reload(); throw new Error("Please log in again"); }
+  const ct = r.headers.get("content-type") || "";
+  const body = ct.includes("json") ? await r.json() : await r.blob();
+  if (!r.ok) throw new Error(body.error || r.statusText);
+  return body;
+}
+const post = (path, data) => api(path, {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(data || {})});
+async function busy(btn, fn) {
+  if (btn) btn.disabled = true;
+  try { return await fn(); } catch (e) { toast(e.message, true); } finally { if (btn) btn.disabled = false; }
+}
+
+// ------------------------------------------------------------ progress panel for uploads and installs
+function activity(label) {
+  let box = $("#activity");
+  if (!box) { box = document.createElement("div"); box.id = "activity"; document.body.appendChild(box); }
+  const el = document.createElement("div"); el.className = "act";
+  el.innerHTML = `<div class="act-row"><span class="act-label"></span><span class="act-pct muted small"></span></div><div class="bar"><div></div></div><div class="act-phase muted small"></div>`;
+  el.querySelector(".act-label").textContent = label;
+  box.appendChild(el);
+  const q = c => el.querySelector(c);
+  return {
+    set(pct, phase) {      // a known percentage
+      el.classList.remove("indet"); q(".bar > div").style.width = Math.max(0, Math.min(100, pct)) + "%";
+      q(".act-pct").textContent = Math.round(pct) + "%"; if (phase !== undefined) q(".act-phase").textContent = phase;
+    },
+    busy(phase) {          // working, no percentage
+      el.classList.add("indet"); q(".bar > div").style.width = ""; q(".act-pct").textContent = ""; q(".act-phase").textContent = phase;
+    },
+    done(ok, msg) {
+      el.classList.remove("indet"); el.classList.add(ok ? "ok" : "bad"); q(".bar > div").style.width = "100%";
+      q(".act-pct").textContent = ok ? "✓" : "✕"; q(".act-phase").textContent = msg || "";
+      setTimeout(() => el.remove(), ok ? 4000 : 15000);
+    }
+  };
+}
+const taskId = () => Math.random().toString(36).slice(2) + Date.now().toString(36);
+// what the server is doing for this task (copying to a tablet: percentage; installing: no percentage)
+function followTask(id, a) {
+  let on = true;
+  (async () => {
+    while (on) {
+      await new Promise(r => setTimeout(r, 700));
+      if (!on) break;
+      try { const p = await api("progress/" + id); if (on && p.phase) { if (p.pct === null || p.pct === undefined) a.busy(p.phase + "…"); else a.set(p.pct, p.phase + "…"); } } catch (e) {}
+    }
+  })();
+  return () => { on = false; };
+}
+// upload with the browser's own progress (fetch cannot report it)
+function uploadXhr(path, body, headers, onProgress) {
+  return new Promise((resolve, reject) => {
+    const x = new XMLHttpRequest();
+    x.open("POST", "/api/" + path); x.setRequestHeader("X-APPC", "1");
+    for (const [k, v] of Object.entries(headers || {})) x.setRequestHeader(k, v);
+    x.upload.onprogress = e => { if (e.lengthComputable) onProgress(100 * e.loaded / e.total); };
+    x.upload.onload = () => onProgress(100, true);
+    x.onload = () => {
+      let r = {}; try { r = JSON.parse(x.responseText); } catch (e) {}
+      if (x.status === 401) { location.reload(); return reject(new Error("Please log in again")); }
+      x.status === 200 ? resolve(r) : reject(new Error(r.error || ("HTTP " + x.status)));
+    };
+    x.onerror = () => reject(new Error("the connection to the dashboard failed"));
+    x.send(body);
+  });
+}
+
+// ------------------------------------------------------------ overview cards
+const STATE = {device: ["Online","ok"], unauthorized: ["Approve on tablet","warn"], busy: ["In use by another computer","warn"],
+  unreachable: ["Offline","bad"], missing: ["Not connected","bad"], error: ["Error","bad"]};
+function fmtDur(s) { if (s == null) return "–"; const d = Math.floor(s/86400), h = Math.floor(s%86400/3600), m = Math.floor(s%3600/60); return d ? `${d}d ${h}h` : h ? `${h}h ${m}m` : `${m}m`; }
+function fmtAgo(t) { if (!t) return "never"; const s = Math.round(Date.now()/1000 - t); return s < 90 ? `${s}s ago` : s < 5400 ? `${Math.round(s/60)} min ago` : new Date(t*1000).toLocaleString(); }
+function fmtGB(kb) { return (kb/1048576).toFixed(1) + " GB"; }
+function fmtWhen(ms) { if (!ms || ms < 0) return "nothing scheduled"; const d = new Date(ms); return d.toLocaleDateString(undefined,{weekday:"short", day:"numeric", month:"short"}) + " " + d.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}); }
+
+function card(d) {
+  const s = d.status || {}, [label, cls] = STATE[s.state] || ["Checking…", ""];
+  const data = (s.disks || []).find(x => x.mount === "/data");
+  const p = s.panel || {};
+  let body = "", pl = [label, cls];
+  if (s.state === "device" && p.remote_management === false) {
+    pl = ["Remote management off", "warn"];
+    body = `<p class="small">Online. To manage it from here, switch on <b>Allow remote management</b> on the tablet: Settings › Developer options › Network debugging &amp; remote management.</p>`;
+  } else if (s.state === "device") {
+    body = `<div class="kv">
+      <div>Screen</div><div>${esc(s.screen || "–")}</div>
+      <div>Showing</div><div title="${esc(s.foreground || "")}">${esc(s.foreground_name || s.foreground || "–")}</div>
+      <div>Next</div><div>${esc(fmtWhen(p.next))}</div>
+      <div>Up</div><div>${fmtDur(s.uptime)}</div>
+      <div>Storage</div><div>${data ? fmtGB(data.free_kb) + " free of " + fmtGB(data.total_kb) + `<div class="bar"><i style="width:${Math.round(100*data.used_kb/data.total_kb)}%"></i></div>` : "–"}</div>
+    </div>`;
+  } else if (s.state === "unauthorized") {
+    body = `<p class="small">Tap <b>Allow</b> on the tablet's "Allow debugging?" prompt (tick "Always allow"). If no prompt appears, "Allow new network computers to ask" is off on the tablet.</p>`;
+  } else if (s.state === "busy") {
+    body = `<p class="small">Android 7.1 serves one adb computer over the network at a time. Disconnect the other computer (<code>adb disconnect</code>) and refresh.</p>`;
+  }
+  return `<div class="card tablet ${sel === d.id ? "sel" : ""}" onclick="select('${d.id}')">
+    <div class="row" style="justify-content:space-between"><span class="name">${esc(d.name)}</span><span class="pill ${pl[1]}">${pl[0]}</span></div>
+    <div class="muted small">${esc(d.address)} · seen ${fmtAgo(s.last_seen)}</div>${body}
+    ${s.state === "device" && p.side_leds ? `<div style="margin-top:8px"><button onclick="event.stopPropagation(); identify('${d.id}', this)" title="Flash this tablet's side LEDs for 30 seconds">💡 Identify</button></div>` : ""}</div>`;
+}
+function renderCards() {
+  $("#tablets").innerHTML = list.length ? list.map(card).join("") :
+    `<div class="card muted">No tablets yet. Add one by its IP address above (network debugging on port 5555 is on by default).</div>`;
+}
+async function load() {
+  try { list = await api("devices"); renderCards(); if (sel && tab === "overview") renderDetail(); } catch (e) {}
+  // just opened: the server is checking the tablets now - show the result as soon as it is there
+  if (list.some(d => !(d.status || {}).checked)) setTimeout(() => { if (!document.hidden) load(); }, 3000);
+}
+async function addTablet() {
+  const address = $("#newAddr").value.trim(); if (!address) return toast("Enter the tablet's IP address", true);
+  await busy(null, async () => { await post("devices", {name: $("#newName").value, address}); $("#newAddr").value = $("#newName").value = ""; toast("Added - connecting…"); await load(); });
+}
+async function identify(id, btn) {
+  await busy(btn, async () => { await post(`devices/${id}/action`, {do: "identify"}); toast("Side LEDs flashing for 30 seconds on " + list.find(x => x.id === id).name); });
+}
+async function refreshAll(btn) { await busy(btn, async () => { await post("refresh"); await load(); }); }
+const cur = () => list.find(x => x.id === sel);
+
+function select(id) { sel = sel === id ? null : id; tab = "overview"; pstate = {}; sched = null; lastShot = null; stopShots(); fs = {root: "internal", path: ""}; renderCards(); renderDetail(); if (sel) loadPanel(); }
+async function loadPanel() {
+  const d = cur(); if (!d) return;
+  try { pstate = await api(`devices/${d.id}/panel`); pstate._got = Date.now(); sched = JSON.parse(JSON.stringify({schedule: pstate.schedule, skip: pstate.skip, quiet: pstate.quiet || null})); }
+  catch (e) { pstate = {error: e.message}; }
+  renderDetail();
+}
+
+// ------------------------------------------------------------ detail
+function renderDetail() {
+  const d = cur(), el = $("#detail");
+  if (!d) { el.innerHTML = ""; return; }
+  const tabs = [["overview","Overview"],["screen","Screen"],["schedule","Power schedule"],["startup","Start-up app"],["buttons","Buttons"],["apps","Apps"],["files","Storage"],["clock","Date & time"],["adb","Network adb"],["copy","Copy settings"]];
+  if (tab !== "screen") stopShots();
+  el.innerHTML = `<section class="card" style="margin-top:16px">
+    <div class="row" style="justify-content:space-between">
+      <h2 style="margin:0">${esc(d.name)} <span class="muted small">${esc(d.address)}</span></h2>
+      <div class="row"><button onclick="renameTablet()">Rename</button><button class="danger" onclick="removeTablet()">Remove</button></div>
+    </div>
+    <div class="tabs">${tabs.map(([k,v]) => `<button class="${tab===k?"on":""}" onclick="tab='${k}';renderDetail()">${v}</button>`).join("")}</div>
+    <div id="pane"></div></section>`;
+  if (pstate.remote_management === false) {
+    $("#pane").innerHTML = `<p class="note">Remote management is off on this tablet, so the dashboard can only see that it is online. Switch it on at the tablet: Settings › Developer options › Network debugging &amp; remote management › <b>Allow remote management</b>.</p><button onclick="loadPanel()">Check again</button>`;
+    return;
+  }
+  if (pstate.error && tab !== "overview") { $("#pane").innerHTML = `<p class="note">${esc(pstate.error)}</p><button onclick="loadPanel()">Try again</button>`; return; }
+  if (!pstate.schedule && tab !== "overview") { $("#pane").innerHTML = `<p class="muted">Loading…</p>`; return; }
+  ({overview: paneOverview, screen: paneScreen, schedule: paneSchedule, startup: paneStartup, buttons: paneButtons, apps: paneApps, files: paneFiles, clock: paneClock, adb: paneAdb, copy: paneCopy})[tab]();
+}
+async function renameTablet() { const d = cur(); const n = prompt("Name", d.name); if (n) { await busy(null, () => post(`devices/${d.id}`, {name: n})); load(); renderDetail(); } }
+async function removeTablet() { const d = cur(); if (confirm(`Remove ${d.name} from the dashboard? (Nothing changes on the tablet.)`)) { await busy(null, () => api(`devices/${d.id}`, {method: "DELETE"})); sel = null; load(); renderDetail(); } }
+
+function paneOverview() {
+  const d = cur(), s = d.status || {};
+  const disks = (s.disks || []).map(x => `<div>${x.mount === "/data" ? "Internal" : "SD card"}</div><div>${fmtGB(x.free_kb)} free of ${fmtGB(x.total_kb)}</div>`).join("");
+  const off = s.clock_offset;
+  $("#pane").innerHTML = `<div class="row" style="margin-bottom:12px">
+      <button onclick="act('screen_on',this)">Screen on</button><button onclick="act('screen_off',this)">Screen off</button>
+      <button onclick="act('reboot',this,'Restart the tablet?')">Restart</button>
+      ${(s.panel||{}).pinned ? `<button onclick="act('unpin',this,'Unpin the app on screen?')">Unpin app</button>` : ""}
+      ${((s.panel||{}).startup||{}).enable ? `<button onclick="act('open_startup_app',this)">Open start-up app</button>` : ""}
+      ${(s.panel||{}).side_leds ? `<button onclick="identify(sel,this)" title="Flash the side LEDs for 30 seconds">💡 Identify</button>` : ""}
+      <button onclick="tab='screen';renderDetail();shot()">Screenshot</button><button onclick="refreshOne(this)">Refresh</button></div>
+    ${(s.panel||{}).brightness != null ? `<div class="kv" style="align-items:center; gap:8px 14px; margin-bottom:12px">
+      <div>Brightness</div><div class="row"><input type="range" min="10" max="255" value="${s.panel.brightness}" style="width:220px"
+        oninput="this.nextElementSibling.textContent=Math.round(this.value/2.55)+'%'" onchange="setLevel('brightness', +this.value)"><span>${Math.round(s.panel.brightness/2.55)}%</span></div>
+      <div>Volume</div><div class="row"><input type="range" min="0" max="${s.panel.volume_max}" value="${s.panel.volume}" style="width:220px"
+        oninput="this.nextElementSibling.textContent=this.value+' / ${s.panel.volume_max}'" onchange="setLevel('volume', +this.value)"><span>${s.panel.volume} / ${s.panel.volume_max}</span></div>
+    </div>` : ""}
+    <div class="kv">
+      <div>Status</div><div>${esc((STATE[s.state]||[s.state||"?"])[0])} (checked ${fmtAgo(s.checked)})</div>
+      <div>Build</div><div>${esc(s.build || "–")}</div>
+      <div>Serial</div><div>${esc(s.serial || "–")}</div>
+      <div>Network</div><div>${esc((s.ips||[]).join(", ") || "–")}</div>
+      <div>Tablet date and time</div><div>${s.clock ? new Date(s.clock*1000).toLocaleString() + " " + esc(s.timezone||"") + (Math.abs(off) > 120 ? ` <span class="pill warn">${Math.round(off/60)} min off</span>` : "") : "–"}</div>
+      <div>Screen</div><div>${esc(s.screen || "–")}</div>
+      <div>Showing</div><div title="${esc(s.foreground || "")}">${esc(s.foreground_name || s.foreground || "–")}</div>
+      <div>Uptime</div><div>${fmtDur(s.uptime)}</div>
+      <div>Load</div><div>${s.load ?? "–"}</div>
+      <div>Memory</div><div>${s.mem_total_kb ? Math.round(s.mem_free_kb/1024) + " MB free of " + Math.round(s.mem_total_kb/1024) + " MB" : "–"}</div>
+      ${disks}
+      <div>Panel settings</div><div>${esc((s.panel||{}).panel_version || s.panel_error || "–")}</div>
+      <div>Next scheduled</div><div>${esc(fmtWhen((s.panel||{}).next))}</div>
+      <div>Pinned app</div><div>${(s.panel||{}).pinned ? "yes - " + esc(s.foreground_name || s.foreground) : "no"}</div>
+    </div>`;
+}
+async function act(what, btn, ask) {
+  if (ask && !confirm(ask)) return;
+  await busy(btn, async () => { await post(`devices/${sel}/action`, {do: what}); toast("Sent: " + ({unpin: "Unpin", open_startup_app: "Open start-up app"}[what] || ALABEL[what] || what)); setTimeout(() => refreshOne(), what === "reboot" ? 60000 : 2500); });
+}
+async function setLevel(key, v) {
+  await busy(null, async () => {
+    const r = await post(`devices/${sel}/panel`, {[key]: v});
+    const d = cur(); if (d && d.status && d.status.panel) d.status.panel[key] = r[key];
+    toast((key === "volume" ? "Volume " + r.volume + " / " + r.volume_max : "Brightness " + Math.round(r.brightness / 2.55) + "%") + " set");
+  });
+}
+async function refreshOne(btn) { await busy(btn, async () => { await post(`devices/${sel}/refresh`); await load(); }); }
+// ------------------------------------------------------------ screen
+function paneScreen() {
+  $("#pane").innerHTML = `<div class="row" style="margin-bottom:10px">
+      <button class="primary" id="shotBtn" onclick="shot(this)">Take screenshot</button>
+      <label><input type="checkbox" id="shotAuto" ${shotTimer ? "checked" : ""} onchange="autoShots(this.checked)"> refresh every 5 seconds</label>
+      ${lastShot ? `<a href="${lastShot}" download="${esc(cur().name)}-${shotTime ? shotTime.toISOString().slice(0,19).replace(/[:T]/g,"-") : "screen"}.png"><button>Save image</button></a>` : ""}
+      <span class="muted small" id="shotInfo">${shotTime ? "Taken " + shotTime.toLocaleTimeString() : "Shows what is on the tablet's screen now (black while the screen is off)."}</span></div>
+    <div id="shotBox">${lastShot ? `<img class="shot" src="${lastShot}" alt="Screenshot of the tablet">` : ""}</div>`;
+}
+async function shot(btn) {
+  await busy(btn, async () => {
+    const b = await api(`devices/${sel}/screenshot`);
+    if (lastShot) URL.revokeObjectURL(lastShot);
+    lastShot = URL.createObjectURL(b); shotTime = new Date();
+    if (tab === "screen") paneScreen();
+  });
+}
+function autoShots(on) { stopShots(); if (on) { shotTimer = setInterval(() => { if (tab === "screen" && sel && !document.hidden) shot(); }, 5000); shot(); } }
+function stopShots() { if (shotTimer) clearInterval(shotTimer); shotTimer = null; }
+
+// ------------------------------------------------------------ storage
+const fmtSize = n => n < 1024 ? n + " B" : n < 1048576 ? (n/1024).toFixed(0) + " KB" : n < 1073741824 ? (n/1048576).toFixed(1) + " MB" : (n/1073741824).toFixed(2) + " GB";
+const fq = (root, path) => `root=${encodeURIComponent(root)}&path=${encodeURIComponent(path)}`;
+async function paneFiles() {
+  const roots = [["internal","Internal storage"],["sd","SD card"]];
+  $("#pane").innerHTML = `<div class="row" style="justify-content:space-between; margin-bottom:8px">
+      <div class="row">${roots.map(([k,l]) => `<button class="${fs.root===k?"primary":""}" onclick="fs={root:'${k}',path:''};paneFiles()">${l}</button>`).join("")}</div>
+      <div class="row"><input type="file" id="upFile" multiple><button onclick="uploadFiles(this)">Upload here</button><button onclick="newFolder()">New folder</button></div></div>
+    <div id="fileList" class="muted">Loading…</div>`;
+  try {
+    const r = await api(`devices/${sel}/files?${fq(fs.root, fs.path)}`);
+    // firmware packages at the top of the SD card, as the tablet's Firmware update checks them
+    let fw = {};
+    if (fs.root === "sd" && !fs.path && r.entries.some(e => /\.img$/i.test(e.name)))
+      try { for (const f of await api(`devices/${sel}/firmware`)) if (f.medium === "SD card") fw[f.file] = f; } catch (e) {}
+    window._fw = fw;
+    const parts = r.path ? r.path.split("/") : [];
+    const crumbs = [`<a href="#" onclick="fs.path='';paneFiles();return false">${fs.root === "sd" ? "SD card" : "Internal storage"}</a>`]
+      .concat(parts.map((p, i) => `<a href="#" onclick="fs.path=${esc(JSON.stringify(parts.slice(0, i+1).join("/")))};paneFiles();return false">${esc(p)}</a>`)).join(" / ");
+    const rows = r.entries.map(e => {
+      const p = (r.path ? r.path + "/" : "") + e.name, js = esc(JSON.stringify(p)), f = fw[e.name];
+      const apk = !e.dir && /\.apk$/i.test(e.name);
+      // what the file is, under its name (so the button columns stay aligned)
+      const note = f ? (f.problem ? `<div class="small"><span class="pill warn">firmware - can't install: ${esc(f.problem)}</span></div>`
+          : `<div class="small"><span class="pill ${f.keeps_data ? "ok" : "warn"}">firmware · ${f.stock_restore ? "stock 4.4 restore - wipes everything" : f.keeps_data ? "keeps apps and data" : "wipes apps and data"}</span> <span class="muted">${esc(f.build)}</span></div>`)
+        : apk ? `<div class="small muted">app</div>` : "";
+      const install = apk ? `<button class="primary fbtn" onclick="installApkFile(this, ${js})">Install</button>`
+        : f && !f.problem ? `<button class="primary fbtn" onclick="installFirmware(this, ${esc(JSON.stringify(e.name))})" title="Install this firmware">Install</button>` : "";
+      return `<tr><td>${e.dir ? `📁 <a href="#" onclick="fs.path=${js};paneFiles();return false">${esc(e.name)}</a>` : "📄 " + esc(e.name)}${note}</td>
+        <td class="muted nowrap">${e.dir ? "" : fmtSize(e.size)}</td><td class="muted small nowrap">${e.mtime ? new Date(e.mtime*1000).toLocaleString() : ""}</td>
+        <td class="act">${install}</td>
+        <td class="act">${e.dir ? "" : `<a href="/api/devices/${sel}/file?${fq(fs.root, p)}"><button class="fbtn">Download</button></a>`}</td>
+        <td class="act"><button class="danger fbtn" onclick="delFile(${js}, ${e.dir})">Delete</button></td></tr>`; }).join("");
+    $("#fileList").className = "scroll";
+    $("#fileList").innerHTML = `<div style="margin-bottom:6px">${crumbs}${r.total_kb ? ` <span class="muted small">· ${fmtGB(r.free_kb)} free of ${fmtGB(r.total_kb)}</span>` : ""}</div>
+      <table class="files"><tr><th>Name</th><th>Size</th><th>Modified (tablet)</th><th class="act"></th><th class="act"></th><th class="act"></th></tr>${rows || `<tr><td colspan="6" class="muted">Empty folder</td></tr>`}</table>`;
+  } catch (e) { $("#fileList").textContent = e.message; }
+}
+async function uploadFiles(btn) {
+  const files = [...$("#upFile").files]; if (!files.length) return toast("Choose one or more files", true);
+  const tab = cur().name;
+  await busy(btn, async () => {
+    for (const f of files) {
+      const a = activity(f.name), id = taskId();
+      let stop = null;
+      try {
+        await uploadXhr(`devices/${sel}/file?${fq(fs.root, fs.path)}`, f, {"X-Filename": encodeURIComponent(f.name), "X-Task": id},
+          (pct, sent) => { if (sent) { a.busy("Copying to " + tab + "…"); stop = stop || followTask(id, a); } else a.set(pct, `Uploading to the dashboard (${fmtSize(f.size)})…`); });
+        a.done(true, "On " + tab);
+      } catch (e) { a.done(false, e.message); throw e; } finally { if (stop) stop(); }
+    }
+    toast(files.length === 1 ? "Uploaded " + files[0].name : `Uploaded ${files.length} files`); paneFiles();
+  });
+}
+async function installApkFile(btn, p) {
+  const name = p.split("/").pop(), a = activity("Installing " + name), id = taskId();
+  a.busy("Installing on " + cur().name + "…");
+  await busy(btn, async () => {
+    try {
+      const r = await api(`devices/${sel}/install-file`, {method: "POST", headers: {"Content-Type": "application/json", "X-Task": id}, body: JSON.stringify({root: fs.root, path: p})});
+      a.done(r.ok, r.ok ? "Installed on " + cur().name : (r.output || "Install failed"));
+      toast(r.ok ? "Installed " + name : (r.output || "Install failed"), !r.ok);
+    } catch (e) { a.done(false, e.message); throw e; }
+  });
+}
+async function installFirmware(btn, name) {
+  const f = window._fw[name], d = cur();
+  const what = f.stock_restore
+    ? "This puts the tablet back to the STOCK Android 4.4 and ERASES all apps, settings and files on it. The dashboard cannot manage it afterwards."
+    : f.keeps_data
+      ? "Apps, settings and files are kept (bug-fix update)."
+      : "This ERASES all apps, settings and files on the tablet. Afterwards the tablet must approve this dashboard again and Remote management must be switched on again at the tablet.";
+  if (!confirm(`Install firmware on ${d.name}?\n\n${name}\n${f.build}\n\n${what}\n\nThe tablet restarts into the installer (about 5 minutes, screen shows progress). Do not switch it off.`)) return;
+  await busy(btn, async () => {
+    await post(`devices/${sel}/install-file`, {root: "sd", path: name});
+    toast(`${d.name} is restarting into the firmware installer`);
+  });
+}
+async function delFile(p, dir) {
+  if (!confirm(`Delete ${dir ? "the folder " + p + " and everything in it" : p} from the tablet? This cannot be undone.`)) return;
+  await busy(null, async () => { await api(`devices/${sel}/file?${fq(fs.root, p)}`, {method: "DELETE"}); toast("Deleted"); paneFiles(); });
+}
+async function newFolder() {
+  const n = prompt("Folder name"); if (!n || n.includes("/")) return;
+  await busy(null, async () => { await post(`devices/${sel}/mkdir`, {root: fs.root, path: (fs.path ? fs.path + "/" : "") + n}); paneFiles(); });
+}
+
+// ------------------------------------------------------------ schedule
+const pad = n => String(n).padStart(2, "0");
+const hhmm = m => pad(Math.floor(m/60)) + ":" + pad(m%60);
+const mins = s => { const [h, m] = s.split(":").map(Number); return h*60 + m; };
+const dkey = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const nice = k => new Date(k + "T12:00").toLocaleDateString(undefined, {weekday: "short", day: "numeric", month: "short", year: "numeric"});
+const actSel = (v, on) => v === "shutdown" ? `<span title="Set on the tablet - the dashboard cannot add shut-down times">Shut down <span class="pill">set on tablet</span></span>` : `<select onchange="${on}">${ACTIONS.map(([k,l]) => `<option value="${k}" ${k===v?"selected":""}>${l}</option>`).join("")}</select>`;
+function newId() { return Date.now() + Math.floor(Math.random()*1000); }
+
+function runsOn(e, day, skip) {   // same rules as the tablet (Scheduler.Entry.runsOn)
+  const k = dkey(day);
+  if (e.date) return e.date === k;
+  const dow = day.getDay() + 1, days = e.days || [];
+  return (days.length === 0 || days.includes(dow)) && (!e.from || k >= e.from) && (!e.until || k <= e.until) && !skip.includes(k);
+}
+// From / Until of a weekly time: optional - empty = it repeats every week with no start / end date
+function dateCell(i, key, emptyText) {
+  const v = sched.schedule[i][key];
+  if (!v) return `<span class="muted">${emptyText}</span> <button class="small" style="padding:2px 8px" onclick="S_(${i},'${key}','${dkey(new Date())}')" title="Set a date">+ date</button>`;
+  return `<input type="date" value="${v}" onchange="S_(${i},'${key}',this.value||null)"> <button class="small" style="padding:2px 8px" onclick="S_(${i},'${key}',null)" title="Remove the date (repeat every week)">✕</button>`;
+}
+const QUIET_TIMES = [[15,"15 seconds"],[30,"30 seconds"],[60,"1 minute"],[300,"5 minutes"],[900,"15 minutes"],[1800,"30 minutes"],
+  [3600,"1 hour"],[7200,"2 hours"],[10800,"3 hours"],[14400,"4 hours"],[21600,"6 hours"],[28800,"8 hours"],[43200,"12 hours"],
+  [0,"never (it stays on until the next scheduled time)"]];
+function paneSchedule() {
+  const S = sched, today = dkey(new Date());
+  const weekly = S.schedule.filter(e => !e.date), dated = S.schedule.filter(e => e.date).sort((a,b) => (a.date+hhmm(a.minutes)).localeCompare(b.date+hhmm(b.minutes)));
+  const idx = e => S.schedule.indexOf(e);
+  const wRows = weekly.map(e => { const i = idx(e); return `<tr>
+      <td><input type="checkbox" ${e.enabled?"checked":""} onchange="S_(${i},'enabled',this.checked)"></td>
+      <td><input type="time" value="${hhmm(e.minutes)}" onchange="S_(${i},'minutes',mins(this.value))"></td>
+      <td>${actSel(e.action, `S_(${i},'action',this.value)`)}</td>
+      <td class="days">${WEEK.map(([n,l]) => `<label><input type="checkbox" ${(e.days||[]).length===0||e.days.includes(n)?"checked":""} onchange="toggleDay(${i},${n},this.checked)">${l.slice(0,2)}</label>`).join("")}</td>
+      <td class="nowrap">${dateCell(i, "from", "now")}</td>
+      <td class="nowrap">${dateCell(i, "until", "no end")}</td>
+      <td><button class="danger" onclick="delEntry(${i})">✕</button></td></tr>`; }).join("");
+  const dRows = dated.map(e => { const i = idx(e); return `<tr>
+      <td><input type="checkbox" ${e.enabled?"checked":""} onchange="S_(${i},'enabled',this.checked)"></td>
+      <td><input type="date" value="${e.date}" onchange="S_(${i},'date',this.value)"> ${e.date < today ? '<span class="pill">past</span>' : ""}</td>
+      <td><input type="time" value="${hhmm(e.minutes)}" onchange="S_(${i},'minutes',mins(this.value))"></td>
+      <td>${actSel(e.action, `S_(${i},'action',this.value)`)}</td>
+      <td><button class="danger" onclick="delEntry(${i})">✕</button></td></tr>`; }).join("");
+  const others = list.filter(x => x.id !== sel);
+  $("#pane").innerHTML = `
+    <p class="note">"Screen on/off" switches the display only - the tablet keeps running, so it stays reachable. Times are the tablet's own clock. Shut-down times are not offered here (a tablet cannot switch itself back on).</p>
+    <h3>Every week</h3>
+    <div class="scroll"><table><tr><th>On</th><th>Time</th><th>Action</th><th>Days</th><th>From <span class="muted">(optional)</span></th><th>Until <span class="muted">(optional)</span></th><th></th></tr>${wRows || `<tr><td colspan="7" class="muted">No weekly times</td></tr>`}</table></div>
+    <p class="muted small" style="margin:6px 0 0">From and Until are optional: leave them empty and the time repeats every week. Set them to use the time only between those dates.</p>
+    <div class="row" style="margin-top:8px"><button onclick="addWeekly()">+ Weekly time</button>
+      <button onclick="addPair()">+ Weekday on/off pair</button></div>
+    <h3>Specific dates</h3>
+    <div class="scroll"><table><tr><th>On</th><th>Date</th><th>Time</th><th>Action</th><th></th></tr>${dRows || `<tr><td colspan="5" class="muted">No dated times</td></tr>`}</table></div>
+    <div class="row" style="margin-top:8px"><button onclick="addDated()">+ Time on a date</button></div>
+    <div class="card" style="margin-top:10px; box-shadow:none">
+      <b>Special day</b> <span class="muted small">- the screen is on only between these times that day</span>
+      <div class="row" style="margin-top:6px"><input type="date" id="spDate" value="${today}"> on <input type="time" id="spOn" value="09:00"> off <input type="time" id="spOff" value="17:00">
+        <label><input type="checkbox" id="spSkip" checked> skip the weekly times that day</label><button onclick="addSpecial()">Add</button></div>
+    </div>
+    <h3>Days off <span class="muted small" style="text-transform:none">- no weekly times on these dates (dated times still run)</span></h3>
+    <div>${S.skip.map(k => `<span class="chip">${nice(k)}${k<today?" (past)":""}<button onclick="delSkip('${k}')">✕</button></span>`).join("") || `<span class="muted">None</span>`}</div>
+    <div class="row" style="margin-top:6px"><input type="date" id="skipDate" value="${today}"><button onclick="addSkip()">+ Day off</button></div>
+    <h3>Quiet hours</h3>
+    ${S.quiet ? `<label class="row"><input type="checkbox" ${S.quiet.enable ? "checked" : ""} onchange="sched.quiet.enable=this.checked"> <b>Keep the screen off from a "Screen off" time until the next "Screen on" time</b></label>
+      <p class="muted">If an app or a notification switches the screen on in that time, it goes off again after 30 seconds. The tablet can still be woken (its Back button, or Screen on here): once someone touches the screen it stays on, and goes off again after
+        <select onchange="sched.quiet.timeout=+this.value">${QUIET_TIMES.map(([v,l]) => `<option value="${v}" ${v===S.quiet.timeout?"selected":""}>${l}</option>`).join("")}</select>
+        without a touch or button press. Needs a later "Screen on" time in the schedule.
+        ${pstate.quiet && pstate.quiet.until > 0 ? `<br><span class="pill ok">quiet now, until ${esc(fmtWhen(pstate.quiet.until))}</span>` : ""}</p>`
+      : `<p class="muted">Needs firmware N1.3 on the tablet.</p>`}
+    <h3>What happens - next 14 days</h3><div class="preview">${preview()}</div>
+    <div class="row" style="margin-top:14px; justify-content:space-between">
+      <div class="row"><button class="primary" onclick="saveSchedule(this,[sel])">Save to tablet</button><button onclick="loadPanel()">Discard changes</button></div>
+      ${others.length ? `<div class="row"><span class="muted">Copy to:</span>${others.map(o => `<label><input type="checkbox" class="copyTo" value="${o.id}"> ${esc(o.name)}</label>`).join("")}<button onclick="copySchedule(this)">Save to selected</button></div>` : ""}
+    </div>`;
+}
+function preview() {
+  const S = sched, out = [], now = new Date();
+  for (let i = 0; i < 14; i++) {
+    const day = new Date(now.getFullYear(), now.getMonth(), now.getDate() + i);
+    const ev = S.schedule.filter(e => e.enabled && runsOn(e, day, S.skip)).sort((a,b) => a.minutes - b.minutes);
+    const off = !S.skip.includes(dkey(day)) ? "" : ' <span class="pill">day off</span>';
+    out.push(`<div class="day"><div><b>${day.toLocaleDateString(undefined,{weekday:"short", day:"numeric", month:"short"})}</b>${off}</div><div>${
+      ev.length ? ev.map(e => `<span class="ev ${e.action}">${hhmm(e.minutes)} ${ALABEL[e.action].toLowerCase()}${e.date?" ★":""}</span>`).join("") : '<span class="muted">nothing</span>'}</div></div>`);
+  }
+  return out.join("") + `<div class="muted small" style="margin-top:4px">★ = time for that date only</div>`;
+}
+function S_(i, k, v) { sched.schedule[i][k] = v; paneSchedule(); }
+function toggleDay(i, n, on) {
+  const e = sched.schedule[i]; let d = (e.days||[]).length ? e.days.slice() : [1,2,3,4,5,6,7];
+  d = on ? [...new Set([...d, n])] : d.filter(x => x !== n);
+  if (!d.length) return toast("Pick at least one day (or delete the time)", true), paneSchedule();
+  e.days = d.sort(); paneSchedule();
+}
+function delEntry(i) { sched.schedule.splice(i, 1); paneSchedule(); }
+function addWeekly() { sched.schedule.push({id: newId(), action: "screen_off", minutes: 18*60, days: [2,3,4,5,6], enabled: true}); paneSchedule(); }
+function addPair() {
+  sched.schedule.push({id: newId(), action: "screen_on", minutes: 8*60, days: [2,3,4,5,6], enabled: true},
+                      {id: newId()+1, action: "screen_off", minutes: 18*60, days: [2,3,4,5,6], enabled: true}); paneSchedule();
+}
+function addDated() { sched.schedule.push({id: newId(), action: "screen_on", minutes: 9*60, date: dkey(new Date()), days: [], enabled: true}); paneSchedule(); }
+function addSpecial() {
+  const d = $("#spDate").value, on = $("#spOn").value, off = $("#spOff").value;
+  if (!d || !on || !off) return toast("Fill in date and times", true);
+  sched.schedule.push({id: newId(), action: "screen_on", minutes: mins(on), date: d, days: [], enabled: true},
+                      {id: newId()+1, action: "screen_off", minutes: mins(off), date: d, days: [], enabled: true});
+  if ($("#spSkip").checked && !sched.skip.includes(d)) sched.skip.push(d), sched.skip.sort();
+  paneSchedule(); toast("Added for " + nice(d) + " - Save to tablet to apply");
+}
+function addSkip() { const d = $("#skipDate").value; if (d && !sched.skip.includes(d)) { sched.skip.push(d); sched.skip.sort(); } paneSchedule(); }
+function delSkip(k) { sched.skip = sched.skip.filter(x => x !== k); paneSchedule(); }
+async function saveSchedule(btn, ids) {
+  await busy(btn, async () => {
+    for (const id of ids) {
+      const r = await post(`devices/${id}/panel`, Object.assign({schedule: sched.schedule, skip: sched.skip},
+        sched.quiet ? {quiet: {enable: sched.quiet.enable, timeout: sched.quiet.timeout}} : {}));
+      if (id === sel) { pstate = r; sched = JSON.parse(JSON.stringify({schedule: r.schedule, skip: r.skip, quiet: r.quiet || null})); }
+    }
+    toast("Schedule saved to " + ids.map(id => list.find(x => x.id === id).name).join(", "));
+    await post(`devices/${sel}/refresh`).catch(() => {}); await load(); paneSchedule();
+  });
+}
+function copySchedule(btn) {
+  const ids = [...document.querySelectorAll(".copyTo:checked")].map(x => x.value);
+  if (!ids.length) return toast("Tick the tablets to copy to", true);
+  if (confirm("Replace the schedule on the ticked tablets with this one?")) saveSchedule(btn, [sel, ...ids]);
+}
+
+// ------------------------------------------------------------ start-up app
+function paneStartup() {
+  const s = pstate.startup || {}, apps = pstate.apps || [];
+  $("#pane").innerHTML = `<p class="muted" style="margin-top:0">Open one app every time the tablet has started (Settings › Start-up app on the tablet).</p>
+    <div class="kv" style="align-items:center; gap:10px 14px">
+      <div>Enabled</div><div><input type="checkbox" id="suOn" ${s.enable?"checked":""}></div>
+      <div>App</div><div><select id="suApp"><option value="">– choose –</option>${apps.map(([l,c]) => `<option value="${esc(c)}" ${c===s.app?"selected":""}>${esc(l)}</option>`).join("")}</select>
+        ${s.app && !apps.some(a => a[1] === s.app) ? `<span class="pill warn">saved app not installed</span>` : ""}</div>
+      <div>Pin the app</div><div><label><input type="checkbox" id="suPin" ${s.pin?"checked":""}> screen pinning - Home / Overview cannot leave the app (unpin from Overview here, or touch and hold the on-screen Back button on the tablet)</label></div>
+      <div>Delay</div><div><select id="suDelay">${[[0,"None"],[5,"5 seconds"],[10,"10 seconds"],[30,"30 seconds"],[60,"1 minute"]].map(([v,l]) => `<option value="${v}" ${v===s.delay?"selected":""}>${l}</option>`).join("")}</select></div>
+    </div>
+    <div class="row" style="margin-top:14px"><button class="primary" onclick="saveStartup(this)">Save to tablet</button>
+      <button onclick="openApp(this)">Open this app now</button></div>
+    <h3>Screen pinning</h3>
+    ${pstate.pin_allowed === undefined ? `<p class="muted">Needs firmware N1.1 with Panel settings 1.4.</p>`
+      : pstate.pin_allowed.length
+        ? `<p>Apps that pin themselves without asking: <b>${pstate.pin_allowed.map(a => esc(a[1])).join(", ")}</b></p>
+           <button onclick="clearPinAllowed(this)">Ask again next time</button>`
+        : `<p class="muted">None yet. When an app pins itself, the tablet asks once; after "Got it" it no longer asks for that app.</p>`}
+    <h3>If the pinned app crashes</h3>
+    ${pstate.pin_restart ? `<label class="row"><input type="checkbox" id="prOn" ${pstate.pin_restart.enabled ? "checked" : ""} onchange="savePinRestart(this)"> <b>Restart the pinned app if it crashes</b></label>
+      <p class="muted">Off by default. When on, a pinned app that stops with an error opens again and is pinned again, without the "has stopped" message on the tablet. Repeated crashes wait longer each time, up to a minute.</p>
+      <p class="small">${pstate.pin_restart.restarts ? `Restarted <b>${pstate.pin_restart.restarts}</b> time${pstate.pin_restart.restarts === 1 ? "" : "s"} so far, last ${esc(new Date(pstate.pin_restart.last).toLocaleString())}${pstate.pin_restart.last_app ? ` (${esc(pstate.pin_restart.last_app)})` : ""}` : `<span class="muted">No crash restarts so far.</span>`}</p>`
+      : `<p class="muted">Needs Panel settings 1.8 on the tablet.</p>`}
+    <h3>Unpin lock</h3>
+    ${pstate.pin_lock ? `<label class="row"><input type="checkbox" id="plOn" ${pstate.pin_lock.enabled ? "checked" : ""}> <b>Ask for a PIN on the tablet to unpin</b></label>
+      <p class="muted">Off by default. When on, touching and holding Back on a pinned app asks for this PIN instead of unpinning. "Unpin app" on the Overview tab here always works.</p>
+      <div class="row"><span>PIN</span><input id="plPin" type="password" inputmode="numeric" maxlength="8" size="10" autocomplete="off" placeholder="${pstate.pin_lock.pin_set ? "unchanged" : "4 to 8 digits"}">
+        <button onclick="savePinLock(this)">Save</button><span class="muted small">${pstate.pin_lock.pin_set ? "A PIN is set on the tablet" : "No PIN set yet"}</span></div>
+      ${pstate.pin_lock.pin_set ? `<div class="row" style="margin-top:8px"><button class="danger" onclick="removePinLock(this)">Remove the PIN</button>
+        <span class="muted small">Forgets the PIN and switches the unpin lock off - for example when the PIN has been forgotten.</span></div>` : ""}`
+      : `<p class="muted">Needs firmware N1.3 on the tablet.</p>`}`;
+}
+async function savePinRestart(box) {
+  const on = box.checked; box.disabled = true;
+  try {
+    pstate = await post(`devices/${sel}/panel`, {pin_restart: {enabled: on}});
+    toast(on ? "The pinned app restarts by itself if it crashes" : "Crash restart is off");
+  } catch (e) { toast(e.message, true); }
+  paneStartup();
+}
+async function removePinLock(btn) {
+  if (!confirm("Remove the unpin PIN from this tablet?\n\nThe unpin lock is switched off: holding Back on a pinned app unpins it straight away again. A new PIN can be set here at any time.")) return;
+  await busy(btn, async () => {
+    pstate = await post(`devices/${sel}/panel`, {pin_lock: {remove: true}});
+    toast(pstate.pin_lock && !pstate.pin_lock.pin_set ? "PIN removed - the unpin lock is off" : "The tablet did not confirm - check its firmware", !(pstate.pin_lock && !pstate.pin_lock.pin_set));
+    paneStartup();
+  });
+}
+async function savePinLock(btn) {
+  const on = $("#plOn").checked, pin = $("#plPin").value.trim();
+  if (pin && !/^\d{4,8}$/.test(pin)) return toast("The PIN must be 4 to 8 digits", true);
+  if (on && !pin && !pstate.pin_lock.pin_set) return toast("Type a PIN first", true);
+  await busy(btn, async () => {
+    pstate = await post(`devices/${sel}/panel`, {pin_lock: Object.assign({enabled: on}, pin ? {pin} : {})});
+    toast(on ? "Unpinning now asks for the PIN on the tablet" : "Unpin lock is off"); paneStartup();
+  });
+}
+async function saveStartup(btn) {
+  await busy(btn, async () => {
+    pstate = await post(`devices/${sel}/panel`, {startup: {enable: $("#suOn").checked, app: $("#suApp").value, delay: +$("#suDelay").value, pin: $("#suPin").checked}});
+    toast("Start-up app saved"); paneStartup();
+  });
+}
+async function clearPinAllowed(btn) {
+  await busy(btn, async () => { pstate = await post(`devices/${sel}/panel`, {pin_allowed_clear: true}); toast("The tablet will ask again before an app pins itself"); paneStartup(); });
+}
+async function openApp(btn) {
+  const c = $("#suApp").value; if (!c) return toast("Choose an app", true);
+  await busy(btn, async () => { await post(`devices/${sel}/action`, {do: "launch", component: c}); toast("Opened"); });
+}
+
+// ------------------------------------------------------------ physical buttons
+function paneButtons() {
+  const B = pstate.buttons;
+  if (!B) { $("#pane").innerHTML = `<p class="note">This tablet's Panel settings is too old for button settings (needs 1.3 / firmware N1.0.6).</p>`; return; }
+  const opts = (key, cur) => {
+    const def = B.buttons.find(b => b[0] === key)[2];
+    const list = [["default", def]].concat(B.choices).concat((pstate.apps || []).map(([l, c]) => ["app:" + c, "Open " + l]));
+    const known = list.some(o => o[0] === cur);
+    return list.map(([v, l]) => `<option value="${esc(v)}" ${v === cur ? "selected" : ""}>${esc(l)}</option>`).join("")
+      + (known ? "" : `<option value="${esc(cur)}" selected>${esc(cur)} (not installed)</option>`);
+  };
+  $("#pane").innerHTML = `<p class="muted" style="margin-top:0">The tablet's front buttons (Settings › Physical buttons on the tablet). "Do nothing" switches a button or gesture off.</p>
+    <label class="row"><input type="checkbox" id="btnOn" ${B.enabled ? "checked" : ""}> <b>Physical buttons on</b> <span class="muted">(off = every front button is ignored, Back's gestures included)</span></label>
+    <div class="scroll" style="margin-top:10px"><table>
+      <tr><th>Button</th><th>Does</th></tr>
+      ${B.buttons.map(([k, t]) => `<tr><td>${esc(t)}</td><td><select class="btnAct" data-key="${k}">${opts(k, B.actions[k])}</select></td></tr>`).join("")}
+      <tr><td>Back button - press while the screen is off</td><td><select id="btnWake">
+        <option value="1" ${B.back_wake ? "selected" : ""}>Wake the screen</option><option value="0" ${B.back_wake ? "" : "selected"}>Do nothing</option></select></td></tr>
+    </table></div>
+    <p class="muted small">With "press while the screen is off" set to Do nothing, the screen only comes back by the schedule, the Screen on button here or a restart.</p>
+    <button class="primary" onclick="saveButtons(this)">Save to tablet</button>`;
+}
+async function saveButtons(btn) {
+  const actions = {}; document.querySelectorAll(".btnAct").forEach(s => actions[s.dataset.key] = s.value);
+  await busy(btn, async () => {
+    pstate = await post(`devices/${sel}/panel`, {buttons: {enabled: $("#btnOn").checked, back_wake: $("#btnWake").value === "1", actions}});
+    toast("Buttons saved on the tablet"); paneButtons();
+  });
+}
+
+// ------------------------------------------------------------ apps
+async function paneApps() {
+  const launch = Object.fromEntries((pstate.apps || []).map(([l,c]) => [c.split("/")[0], [l, c]]));
+  $("#pane").innerHTML = `<p class="muted" style="margin-top:0">Apps installed on top of the firmware. Install new ones from the APK library below.</p><div id="appList" class="muted">Loading…</div>`;
+  try {
+    const apps = await api(`devices/${sel}/apps`);
+    $("#appList").className = "scroll";
+    $("#appList").innerHTML = apps.length ? `<table><tr><th>App</th><th>Version</th><th></th></tr>${apps.map(a => {
+      const L = launch[a.package];
+      return `<tr><td title="${esc(a.package)}">${L ? `<b>${esc(L[0])}</b>` : `<span class="muted">${esc(a.package)}</span>`}</td><td>${esc(a.version)}</td>
+        <td class="row">${L ? `<button onclick="appAct(this,'launch',{component:'${esc(L[1])}'})">Open</button>` : ""}
+          <button onclick="appAct(this,'stop',{package:'${esc(a.package)}'})">Close</button>
+          <button class="danger" onclick="appAct(this,'uninstall',{package:'${esc(a.package)}'},'Uninstall ${esc(a.package)} and its data?')">Uninstall</button></td></tr>`; }).join("")}</table>`
+      : "No apps installed besides the firmware's.";
+  } catch (e) { $("#appList").textContent = e.message; }
+}
+async function appAct(btn, what, extra, ask) {
+  if (ask && !confirm(ask)) return;
+  await busy(btn, async () => { const r = await post(`devices/${sel}/action`, {do: what, ...extra}); toast(r.ok ? "Done" : (r.output || "Failed"), !r.ok); if (what === "uninstall") paneApps(); });
+}
+
+// ------------------------------------------------------------ network adb
+function paneAdb() {
+  const ref = pstate.adb_refused || [];
+  $("#pane").innerHTML = `
+    <p class="muted" style="margin-top:0">USB and network debugging stay on whatever is chosen here, so the dashboard keeps working. These switches only control what the tablet shows. Same switches as on the tablet: Settings › Developer options › Network debugging &amp; remote management.</p>
+    <label class="row"><input type="checkbox" ${pstate.adb_allow_new?"checked":""} onchange="setAdb(this,'adb_allow_new')"> <b>Allow new network computers to ask</b></label>
+    <p class="muted">On: a computer on the network connecting for the first time shows "Allow debugging?" on the tablet. Off: it is refused without asking. Computers already allowed (like this dashboard) keep working.</p>
+    <label class="row"><input type="checkbox" ${pstate.adb_allow_new_usb?"checked":""} onchange="setAdb(this,'adb_allow_new_usb')"> <b>Allow new USB computers to ask</b></label>
+    <p class="muted">The same for a computer plugged into the tablet's USB port.</p>
+    <label class="row"><input type="checkbox" ${pstate.adb_notify?"checked":""} onchange="setAdb(this,'adb_notify')"> <b>Show "USB debugging connected" notification</b></label>
+    <p class="muted">The notice in the status bar while a computer is connected by USB. Off hides it; debugging keeps working.</p>
+    <h3>Developer options on the tablet</h3>
+    <label class="row"><input type="checkbox" ${pstate.developer_options_shown ? "checked" : ""} onchange="setDevOptions(this)"> <b>Show Developer options in Settings</b></label>
+    <p class="muted">Only shows or hides the Developer options menu in the tablet's Settings. Everything set in it (USB and network debugging, remote management, ...) stays as it is either way.</p>
+    <h3>Refused recently</h3>
+    ${ref.length ? `<table><tr><th>Time (tablet)</th><th>Computer's key fingerprint</th></tr>${ref.map(r => `<tr><td>${esc(r.time)}</td><td class="small">${esc(r.fingerprint)}</td></tr>`).join("")}</table>` : `<p class="muted">None</p>`}`;
+}
+async function setDevOptions(cb) {
+  await busy(cb, async () => {
+    await post(`devices/${sel}/action`, {do: cb.checked ? "show_developer_options" : "hide_developer_options"});
+    toast(cb.checked ? "Developer options shown in Settings" : "Developer options hidden (settings unchanged)");
+    setTimeout(loadPanel, 2500);
+  });
+}
+async function setAdb(cb, key) {
+  await busy(cb, async () => { pstate = await post(`devices/${sel}/panel`, {[key]: cb.checked}); toast("Saved on the tablet"); paneAdb(); });
+}
+
+// ------------------------------------------------------------ date & time
+function tzOffsetMs(tz, t) {   // time zone's offset from UTC at instant t
+  const p = Object.fromEntries(new Intl.DateTimeFormat("en-US", {timeZone: tz, hourCycle: "h23", year: "numeric", month: "2-digit",
+    day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit"}).formatToParts(new Date(t)).map(x => [x.type, x.value]));
+  return Date.UTC(+p.year, p.month - 1, +p.day, +p.hour, +p.minute, +p.second) - Math.floor(t / 1000) * 1000;
+}
+function paneClock() {
+  if (pstate.timezone === undefined) { $("#pane").innerHTML = `<p class="note">Needs firmware N1.3 on the tablet.</p>`; return; }
+  const tz = pstate.timezone, got = pstate._got || (pstate._got = Date.now());
+  const tabletNow = pstate.now + (Date.now() - got), diff = Math.round((tabletNow - Date.now()) / 1000);
+  let shown; try { shown = new Date(tabletNow).toLocaleString(undefined, {timeZone: tz, dateStyle: "full", timeStyle: "medium"}); } catch (e) { shown = new Date(tabletNow).toUTCString(); }
+  const mine = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  let zones = []; try { zones = Intl.supportedValuesOf("timeZone"); } catch (e) { zones = ["Europe/London","Europe/Dublin","Europe/Amsterdam","Europe/Berlin","Europe/Paris","America/New_York","America/Chicago","America/Los_Angeles","Asia/Tokyo","Australia/Sydney","UTC"]; }
+  $("#pane").innerHTML = `<div class="kv" style="gap:6px 14px">
+      <div>Tablet</div><div><b>${esc(shown)}</b> <span class="muted">(${esc(tz)})</span>
+        ${Math.abs(diff) > 90 ? `<span class="pill warn">${Math.abs(diff) < 5400 ? Math.round(Math.abs(diff)/60) + " min" : Math.round(Math.abs(diff)/3600) + " h"} ${diff > 0 ? "ahead of" : "behind"} this computer</span>` : `<span class="pill ok">matches this computer</span>`}</div>
+      <div>This computer</div><div>${esc(new Date().toLocaleString(undefined, {dateStyle: "full", timeStyle: "medium"}))} <span class="muted">(${esc(mine)})</span></div>
+    </div>
+    <p class="muted">The power schedule runs on the tablet's own clock. Setting it is optional - a tablet with internet access keeps its clock right by itself.</p>
+    <h3>Set the clock</h3>
+    <div class="row"><button class="primary" onclick="setClock(this, {time: Date.now()})">Set to this computer's time</button>
+      <span class="muted">or</span><input type="datetime-local" id="ckWhen" step="1"><button onclick="setClockManual(this)">Set this date and time</button></div>
+    <h3>Time zone</h3>
+    <div class="row"><input id="ckTz" list="tzList" value="${esc(tz)}" size="28"><datalist id="tzList">${zones.map(z => `<option value="${esc(z)}">`).join("")}</datalist>
+      <button onclick="setClock(this, {timezone: $('#ckTz').value.trim()})">Set time zone</button>
+      ${mine !== tz ? `<button onclick="setClock(this, {timezone: '${esc(mine)}'})">Use this computer's (${esc(mine)})</button>` : ""}</div>
+    <h3>Network time</h3>
+    <label class="row"><input type="checkbox" ${pstate.auto_time ? "checked" : ""} onchange="setClock(this, {auto_time: this.checked})"> Use network time when the tablet can reach the internet</label>
+    <p class="muted small">With this on and internet access, the tablet corrects a clock set here by itself.</p>`;
+}
+async function setClock(el, payload) {
+  await busy(el, async () => { pstate = await post(`devices/${sel}/panel`, payload); pstate._got = Date.now(); toast("Saved on the tablet"); paneClock(); post(`devices/${sel}/refresh`).then(load).catch(() => {}); });
+}
+function setClockManual(btn) {
+  const v = $("#ckWhen").value; if (!v) return toast("Choose a date and time", true);
+  const wall = new Date(v + (v.length === 16 ? ":00" : "") + "Z").getTime();     // the typed numbers, as if UTC
+  let t = wall - tzOffsetMs(pstate.timezone, wall); t = wall - tzOffsetMs(pstate.timezone, t);   // as the tablet's local time
+  setClock(btn, {time: t});
+}
+
+// ------------------------------------------------------------ copy settings to other tablets
+const COPY_GROUPS = [
+  ["schedule", "Power schedule", "weekly and dated times, days off, quiet hours", p => Object.assign({schedule: p.schedule.filter(e => e.action !== "shutdown"), skip: p.skip}, p.quiet ? {quiet: {enable: p.quiet.enable, timeout: p.quiet.timeout}} : {})],
+  ["startup", "Start-up app", "app, delay, pin the app, restart it if it crashes (the app must be installed on the other tablet)", p => Object.assign({startup: p.startup}, p.pin_restart ? {pin_restart: {enabled: p.pin_restart.enabled}} : {})],
+  ["buttons", "Buttons", "what each front button and Back gesture does", p => p.buttons ? {buttons: {enabled: p.buttons.enabled, back_wake: p.buttons.back_wake, actions: p.buttons.actions}} : {}],
+  ["adb", "Network adb switches", "new network / USB computers may ask, USB debugging notice", p => ({adb_allow_new: p.adb_allow_new, adb_allow_new_usb: p.adb_allow_new_usb, adb_notify: p.adb_notify})],
+  ["levels", "Brightness and volume", "", p => p.volume === undefined ? {} : {brightness: p.brightness, volume: p.volume}],
+  ["zone", "Time zone", "and the network time switch (not the clock itself)", p => p.timezone === undefined ? {} : {timezone: p.timezone, auto_time: p.auto_time}],
+];
+function paneCopy() {
+  const others = list.filter(x => x.id !== sel);
+  if (!others.length) { $("#pane").innerHTML = `<p class="muted">Add another tablet to copy this one's settings to it.</p>`; return; }
+  $("#pane").innerHTML = `<p class="muted" style="margin-top:0">Copy this tablet's settings to other tablets. What is ticked replaces the same settings there; everything else on them stays as it is.</p>
+    <h3>What to copy</h3>
+    ${COPY_GROUPS.map(([k, t, d]) => `<label class="row" style="margin:4px 0"><input type="checkbox" class="cpWhat" value="${k}" ${k === "schedule" ? "checked" : ""}> <b>${t}</b> <span class="muted small">${d}</span></label>`).join("")}
+    <p class="muted small">Not copied: the unpin PIN (set it on each tablet), shut-down times, apps and files.</p>
+    <h3>To</h3>
+    <div class="row">${others.map(o => `<label><input type="checkbox" class="cpTo" value="${o.id}"> ${esc(o.name)}</label>`).join("")}</div>
+    <div class="row" style="margin-top:14px"><button class="primary" onclick="copySettings(this)">Copy to the ticked tablets</button></div>
+    <div id="cpResult" style="margin-top:10px"></div>`;
+}
+async function copySettings(btn) {
+  const what = [...document.querySelectorAll(".cpWhat:checked")].map(x => x.value), to = [...document.querySelectorAll(".cpTo:checked")].map(x => x.value);
+  if (!what.length || !to.length) return toast("Tick what to copy and at least one tablet", true);
+  if (!confirm(`Replace these settings on ${to.length} tablet${to.length > 1 ? "s" : ""}?`)) return;
+  await busy(btn, async () => {
+    const src = await api(`devices/${sel}/panel`);
+    const payload = Object.assign({}, ...COPY_GROUPS.filter(g => what.includes(g[0])).map(g => g[3](src)));
+    const out = [];
+    for (const id of to) {
+      const name = list.find(x => x.id === id).name;
+      try { await post(`devices/${id}/panel`, payload); out.push(`<div><span class="pill ok">copied</span> ${esc(name)}</div>`); }
+      catch (e) { out.push(`<div><span class="pill bad">failed</span> ${esc(name)}: ${esc(e.message)}</div>`); }
+    }
+    $("#cpResult").innerHTML = out.join("");
+  });
+}
+
+// ------------------------------------------------------------ firmware library, several tablets at once
+let fwList = [], jobTimer = null;
+function fwKind(f) { return f.stock_restore ? ["stock 4.4 restore - wipes everything", "warn"] : f.keeps_data ? ["keeps apps and data", "ok"] : ["wipes apps and data", "warn"]; }
+// ------------------------------------------------------------ tablets on USB: set up for the network (PORTING_NOTES 5m)
+let usbList = [];
+async function loadUsb(btn) {
+  await busy(btn, async () => {
+    try { usbList = await api("usb"); } catch (e) { $("#usb").innerHTML = `<p class="muted small">${esc(e.message)}</p>`; return; }
+    $("#usb").innerHTML = usbList.length ? usbList.map((t, i) => {
+      const pill = (on, yes, no) => `<span class="pill ${on ? "ok" : "warn"}">${on ? yes : no}</span>`;
+      let info, action = "";
+      if (t.state === "unauthorized") info = `<span class="pill warn">waiting</span> Allow this computer on the tablet's screen ("Allow USB debugging?") and tick <b>Always allow</b>, then Look again.`;
+      else if (t.state !== "device") info = `<span class="pill warn">${esc(t.state)}</span>`;
+      else if (!t.appc) info = `<span class="muted">not an APPC-10DSQ (${esc(t.model || "unknown")})</span>`;
+      else {
+        const ips = Object.entries(t.ip || {}).map(([n, a]) => `${esc(a)} <span class="muted small">(${esc(n)})</span>`).join(", ");
+        info = `<span class="muted small">${esc(t.build || "")}</span><br>${pill(t.remote_management, "remote management on", "remote management off")}
+          ${pill(t.network_adb, "network debugging on", "network debugging off")} ${ips || '<span class="pill warn">no network</span>'}
+          ${t.in_list ? `<br><span class="muted small">In the list as <b>${esc(t.in_list.name)}</b> (${esc(t.in_list.address)})</span>` : ""}`;
+        action = `<button class="primary" onclick="usbSetup(${i}, this)">${t.remote_management && t.network_adb && t.in_list && t.in_list.address.includes(":") ? "Set up again" : "Set up for the network"}</button>`;
+      }
+      return `<div class="row" style="justify-content:space-between; align-items:center; margin:8px 0"><div><b>${esc(t.serial)}</b><div>${info}</div></div>${action}</div>`;
+    }).join("") : `<p class="muted small">No tablet on USB. Plug one in with USB debugging on, then Look again.</p>`;
+  });
+}
+async function usbSetup(i, btn) {
+  const t = usbList[i];
+  if (!confirm(`Set up ${t.serial} for the network?\n\nOn the tablet: remote management and network debugging are switched on and this computer is allowed for good. The tablet is then added to the list by its network address.`)) return;
+  await busy(btn, async () => {
+    try {
+      const r = await post(`usb/${encodeURIComponent(t.serial)}/setup`, {});
+      $("#usbResult").innerHTML = `<div class="card" style="box-shadow:none; margin-top:8px"><b>${esc(t.serial)}</b>${r.steps.map(x => `<div>✓ ${esc(x)}</div>`).join("")}</div>`;
+      toast(r.connected ? "Set up - connected over the network" : "Set up - see the steps", !r.connected);
+    } catch (e) {
+      $("#usbResult").innerHTML = `<div class="card" style="box-shadow:none; margin-top:8px"><span class="pill bad">failed</span> ${esc(e.message)}</div>`;
+      toast(e.message, true);
+    }
+    await load(); loadUsb();
+  });
+}
+async function loadFw() {
+  try { fwList = await api("firmware"); } catch (e) { fwList = []; }
+  $("#fwList").innerHTML = fwList.length ? `<div class="scroll"><table><tr><th>Firmware</th><th>Size</th><th>Install on</th><th></th></tr>${fwList.map((f, i) => `<tr>
+      <td>${esc(f.file)}<div class="small">${f.problem ? `<span class="pill bad">${esc(f.problem)}</span>` : `<span class="pill ${fwKind(f)[1]}">${fwKind(f)[0]}</span> <span class="muted">${esc(f.build)}</span>`}</div></td>
+      <td class="nowrap">${fmtSize(f.size)}</td>
+      <td>${f.problem ? "" : `<div class="row">${list.map(t => `<label><input type="checkbox" class="fw${i}" value="${t.id}"> ${esc(t.name)}</label>`).join("") || '<span class="muted">no tablets</span>'}
+        <button class="primary" onclick="installFw(this,${i})">Install</button></div>`}</td>
+      <td><button class="danger" onclick="delFw(${i})">✕</button></td></tr>`).join("")}</table></div>` : `<p class="muted">No firmware uploaded.</p>`;
+}
+async function uploadFw(btn) {
+  const f = $("#fwFile").files[0]; if (!f) return toast("Choose a firmware .img file", true);
+  const a = activity(f.name);
+  await busy(btn, async () => {
+    try {
+      await uploadXhr("firmware", f, {"X-Filename": encodeURIComponent(f.name)},
+        (pct, sent) => sent ? a.busy("Checking the image…") : a.set(pct, `Uploading to the dashboard (${fmtSize(f.size)})…`));
+      a.done(true, "In the firmware library"); toast("Uploaded " + f.name); $("#fwFile").value = ""; loadFw();
+    } catch (e) { a.done(false, e.message); throw e; }
+  });
+}
+async function delFw(i) { if (confirm("Delete " + fwList[i].file + " from the library? (Copies on tablets' SD cards stay.)")) { await busy(null, () => api("firmware/" + encodeURIComponent(fwList[i].file), {method: "DELETE"})); loadFw(); } }
+async function installFw(btn, i) {
+  const f = fwList[i], ids = [...document.querySelectorAll(".fw" + i + ":checked")].map(x => x.value);
+  if (!ids.length) return toast("Tick the tablets to install on", true);
+  const names = ids.map(id => list.find(x => x.id === id).name).join(", ");
+  const what = f.stock_restore ? "This puts the tablets back to the STOCK Android 4.4 and ERASES everything on them. The dashboard cannot manage them afterwards."
+    : f.keeps_data ? "Apps, settings and files are kept."
+    : "This ERASES all apps, settings and files on these tablets. Afterwards each one must allow this dashboard again and have Remote management switched on again.";
+  if (!confirm(`Install ${f.file} on: ${names}?\n\n${f.build}\n\n${what}\n\nEach tablet restarts into the installer (about 5 minutes after copying). Do not switch them off.`)) return;
+  await busy(btn, async () => { await post("firmware/install", {file: f.file, devices: ids}); toast("Update started"); loadJobs(); });
+}
+async function loadJobs() {
+  let jobs = []; try { jobs = await api("jobs"); } catch (e) { return; }
+  const running = jobs.some(j => Object.values(j.devices).some(d => !d.done));
+  $("#jobs").innerHTML = jobs.length ? `<h3>Updates</h3>` + jobs.map(j => `<div class="card" style="box-shadow:none; margin-bottom:8px">
+      <div><b>${esc(j.file)}</b> <span class="muted small">${esc(j.build)} · started ${new Date(j.started * 1000).toLocaleTimeString()}</span></div>
+      <table>${Object.values(j.devices).map(d => `<tr><td style="width:22%">${esc(d.name)}</td>
+        <td style="width:18%"><span class="pill ${d.done ? (d.ok ? "ok" : "bad") : ""}">${esc(d.state)}</span></td>
+        <td>${d.percent != null && !d.done ? `<div class="bar" style="width:160px; display:inline-block; vertical-align:middle"><i style="width:${d.percent}%"></i></div> ${d.percent}% ` : ""}<span class="muted small">${esc(d.detail)}</span></td></tr>`).join("")}</table></div>`).join("") : "";
+  clearTimeout(jobTimer);
+  if (running && !document.hidden) jobTimer = setTimeout(loadJobs, 3000);
+}
+
+// ------------------------------------------------------------ this dashboard's settings
+let settingsOpen = false, me = {};
+async function loadSession() {
+  try { me = await api("session"); } catch (e) { return; }
+  $("#who").innerHTML = me.login ? `${esc(me.user)}${me.app ? "" : ` · <a href="#" onclick="logout();return false">Log out</a>`}` : "no login";
+}
+async function logout() { await fetch("/auth/logout", {method: "POST", headers: {"X-APPC": "1"}}); location.reload(); }
+function toggleSettings() { settingsOpen = !settingsOpen; renderSettings(); }
+async function usePortInUse(btn, port) {
+  await busy(btn, async () => { await post("settings", {port}); toast("Port " + port + " is now the dashboard's port"); renderSettings(); });
+}
+async function renderSettings() {
+  const el = $("#settings");
+  if (!settingsOpen) { el.innerHTML = ""; return; }
+  let st; try { st = await api("settings"); } catch (e) { el.innerHTML = `<section class="card">${esc(e.message)}</section>`; return; }
+  const c = st.certificate, custom = !["127.0.0.1", "0.0.0.0"].includes(st.host);
+  const fixed = Object.entries(st.fixed).filter(x => x[1]).map(x => x[0]);
+  const urls = (st.running.host === "0.0.0.0" ? st.addresses : [st.running.host]).map(ip => `${st.running.https ? "https" : "http"}://${ip}:${st.running.port}/`);
+  el.innerHTML = `<section class="card" style="margin-bottom:16px">
+    <div class="row" style="justify-content:space-between"><h2 style="margin:0">Dashboard settings</h2><button onclick="toggleSettings()">Close</button></div>
+    <h3>Address</h3>
+    <div class="kv" style="align-items:center; gap:8px 14px">
+      <div>Reachable from</div><div class="row"><select id="stHost" onchange="$('#stHostOther').style.display = this.value === 'other' ? '' : 'none'">
+        <option value="127.0.0.1" ${st.host === "127.0.0.1" ? "selected" : ""}>This computer only</option>
+        <option value="0.0.0.0" ${st.host === "0.0.0.0" ? "selected" : ""}>Other computers on the network too</option>
+        <option value="other" ${custom ? "selected" : ""}>One address of this computer…</option></select>
+        <input id="stHostOther" value="${custom ? esc(st.host) : ""}" placeholder="${esc(st.addresses.filter(a => a !== "127.0.0.1")[0] || "10.0.0.5")}" size="16" style="${custom ? "" : "display:none"}"></div>
+      <div>Port</div><div><input id="stPort" type="number" min="1" max="65535" value="${st.port}" style="width:100px"></div>
+      <div>HTTPS</div><div><label><input type="checkbox" id="stHttps" ${st.https ? "checked" : ""}> Encrypt the connection (https://)</label></div>
+    </div>
+    ${st.port_notice ? `<p class="note">${esc(st.port_notice)} It tries port ${st.port} again at every start.
+      <button onclick="usePortInUse(this, ${st.running.port})">Use port ${st.running.port} from now on</button></p>` : ""}
+    ${fixed.length ? `<p class="note">Set on the command line for this run and not changed from here: ${fixed.join(", ")}.</p>` : ""}
+    <div class="row" style="margin-top:10px"><button class="primary" onclick="saveAddress(this)">Save</button>
+      <span class="muted small">Now: ${urls.map(u => esc(u)).join(" · ")}</span></div>
+    ${c ? `<h3>Certificate</h3>
+      ${c.missing ? `<p class="muted">Made when HTTPS is switched on.</p>` : `<div class="kv">
+        <div>Used by</div><div>${c.custom ? "your own certificate: " + esc(c.file) : "this dashboard only (made by it, kept in its data folder)"}</div>
+        <div>Name</div><div>${esc(c.subject || "")}</div>
+        <div>Valid for</div><div>${esc((c.names || []).join(", "))}</div>
+        <div>Until</div><div>${esc(c.not_after || "")}</div>
+        ${c.fingerprint ? `<div>SHA-256</div><div class="small" style="word-break:break-all">${esc(c.fingerprint)}</div>` : ""}
+        ${c.problem ? `<div>Problem</div><div>${esc(c.problem)}</div>` : ""}</div>`}
+      <p class="muted small">Browsers warn about a certificate they do not know. To stop the warning, download it and add it to the browser's or system's trusted certificates on each computer that uses the dashboard.</p>
+      <div class="row"><a href="/api/settings/certificate"><button>Download certificate</button></a>
+        <input id="stNames" size="34" placeholder="extra names / addresses, comma separated" value="${esc((st.names || []).join(", "))}">
+        <button onclick="newCert(this)">Make a new certificate</button></div>
+      <details style="margin-top:8px"><summary class="muted">Use my own certificate instead</summary>
+        <div class="kv" style="align-items:center; gap:8px 14px; margin-top:8px">
+          <div>Certificate file</div><div><input id="stCert" size="50" value="${esc(st.cert)}" placeholder="/path/on/the/dashboard/computer/fullchain.pem"></div>
+          <div>Key file</div><div><input id="stKey" size="50" value="${esc(st.key)}" placeholder="/path/on/the/dashboard/computer/privkey.pem"></div>
+        </div><div class="row" style="margin-top:8px"><button onclick="saveOwnCert(this)">Use these files</button><span class="muted small">Leave both empty to go back to the dashboard's own certificate.</span></div></details>` : ""}
+    <h3>Logins</h3>
+    ${me.login && !st.users.length ? `<p class="note">No login yet. This window needs none, but nobody can use the dashboard from a browser or another computer until you add a login here.</p>` : ""}
+    ${me.login ? `<table>${st.users.map(u => `<tr><td>${esc(u)}${u === me.user ? ' <span class="pill">you</span>' : ""}</td>
+        <td class="row"><button onclick="setPassword('${esc(u)}')">Change password</button>${st.users.length > 1 ? `<button class="danger" onclick="delUser('${esc(u)}')">Remove</button>` : ""}</td></tr>`).join("")}</table>
+      <div class="row" style="margin-top:8px"><input id="nuName" placeholder="New user name" size="16" autocomplete="off"><input id="nuPw" type="password" placeholder="Password (8 or more)" size="20" autocomplete="new-password"><button onclick="addUser(this)">Add login</button></div>`
+      : `<p class="note">Started with --no-login: no user name or password is asked.</p>`}
+    <p class="muted small" style="margin-top:14px">Version ${esc(st.version)} · data folder ${esc(st.data)} · adb ${esc(st.adb)}</p>
+  </section>`;
+}
+function goTo(r) { toast("Restarting on the new address…"); setTimeout(() => { location.href = `${r.https ? "https" : "http"}://${location.hostname}:${r.port}/`; }, 2500); }
+async function saveAddress(btn) {
+  const h = $("#stHost").value === "other" ? $("#stHostOther").value.trim() : $("#stHost").value;
+  if (!h) return toast("Type the address", true);
+  await busy(btn, async () => { const r = await post("settings", {host: h, port: +$("#stPort").value, https: $("#stHttps").checked}); if (r.restart) goTo(r); else { toast("Saved"); renderSettings(); } });
+}
+async function newCert(btn) {
+  if (!confirm("Make a new certificate? Computers that trusted the old one will warn again until the new one is added.")) return;
+  await busy(btn, async () => { await post("settings/certificate", {names: $("#stNames").value.split(",").map(x => x.trim()).filter(Boolean)}); toast("New certificate made"); setTimeout(() => location.reload(), 2500); });
+}
+async function saveOwnCert(btn) { await busy(btn, async () => { const r = await post("settings", {cert: $("#stCert").value.trim(), key: $("#stKey").value.trim()}); if (r.restart) goTo(r); else { toast("Saved"); renderSettings(); } }); }
+async function addUser(btn) { await busy(btn, async () => { await post("users", {user: $("#nuName").value.trim(), password: $("#nuPw").value}); toast("Login added"); renderSettings(); }); }
+async function setPassword(u) { const pw = prompt("New password for " + u + " (8 or more characters)"); if (pw) await busy(null, async () => { await post("users", {user: u, password: pw}); toast("Password changed"); }); }
+async function delUser(u) { if (confirm("Remove the login " + u + "?")) await busy(null, async () => { await api("users/" + encodeURIComponent(u), {method: "DELETE"}); renderSettings(); if (u === me.user) location.reload(); }); }
+
+// ------------------------------------------------------------ APK library
+async function loadApks() {
+  try { apks = await api("apks"); } catch (e) { apks = []; }
+  $("#apks").innerHTML = apks.length ? `<div class="scroll"><table><tr><th>APK</th><th>Size</th><th>Install on</th><th></th></tr>${apks.map((a, i) => `<tr>
+      <td>${esc(a.name)}</td><td>${(a.size/1048576).toFixed(1)} MB</td>
+      <td class="row">${list.map(t => `<label><input type="checkbox" class="inst${i}" value="${t.id}"> ${esc(t.name)}</label>`).join("") || '<span class="muted">no tablets</span>'}
+        <button onclick="installApk(this,${i})">Install</button></td>
+      <td><button class="danger" onclick="delApk('${esc(a.name)}')">✕</button></td></tr>`).join("")}</table></div>` : `<p class="muted">No APKs uploaded.</p>`;
+}
+async function uploadApk(btn) {
+  const f = $("#apkFile").files[0]; if (!f) return toast("Choose an APK file", true);
+  const a = activity(f.name);
+  await busy(btn, async () => {
+    try {
+      await uploadXhr("apks", f, {"X-Filename": f.name},
+        (pct, sent) => sent ? a.busy("Saving…") : a.set(pct, `Uploading to the dashboard (${fmtSize(f.size)})…`));
+      a.done(true, "In the APK library"); $("#apkFile").value = ""; toast("Uploaded " + f.name); loadApks();
+    } catch (e) { a.done(false, e.message); throw e; }
+  });
+}
+async function installApk(btn, i) {
+  const ids = [...document.querySelectorAll(".inst" + i + ":checked")].map(x => x.value);
+  if (!ids.length) return toast("Tick the tablets to install on", true);
+  const apk = apks[i].name;
+  // one bar per tablet, all shown at once; they are installed one after another
+  const bars = ids.map(id => { const a = activity(apk + " → " + list.find(x => x.id === id).name); a.busy("Waiting…"); return a; });
+  await busy(btn, async () => {
+    for (const [k, id] of ids.entries()) {
+      const name = list.find(x => x.id === id).name, a = bars[k], t = taskId();
+      a.busy("Starting…");
+      const stop = followTask(t, a);
+      const r = await api(`devices/${id}/install`, {method: "POST", headers: {"Content-Type": "application/json", "X-Task": t}, body: JSON.stringify({apk})})
+        .catch(e => ({ok: false, output: e.message}));
+      stop();
+      a.done(r.ok, r.ok ? "Installed on " + name : (r.output || "Install failed"));
+      if (!r.ok) toast(`${name}: ${r.output}`, true);
+    }
+  });
+}
+async function delApk(n) { if (confirm("Delete " + n + " from the library?")) { await busy(null, () => api("apks/" + encodeURIComponent(n), {method: "DELETE"})); loadApks(); } }
+
+loadSession(); load().then(() => { loadApks(); loadFw(); loadJobs(); loadUsb(); });
+// only while this tab is visible: the server contacts the tablets only while a page is asking
+setInterval(() => { if (!document.hidden) load(); }, 15000);
+document.addEventListener("visibilitychange", () => { if (!document.hidden) load(); });
+</script>
+</body>
+</html>
