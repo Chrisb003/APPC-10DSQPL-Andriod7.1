@@ -161,6 +161,8 @@ The extra Settings screens from the official images are carried over and extende
 
 Runs as a Mac app, or with Python on a Mac, Windows PC, Linux computer or Raspberry Pi. Like the rest of remote management, it only reaches tablets on the same network as the computer it runs on.
 
+**Get it:** download `APPC-Tablet-Dashboard-Python-0.4.zip` from the [dashboard release](https://github.com/Chrisb003/APPC-10DSQPL-Andriod7.1/releases/tag/dashboard-0.4). Install and use instructions for Windows, Mac and Linux are in the [dashboard folder](APPC-Tablet-Dashboard-Python-0.4/).
+
 - **Tablets:**
   - status and screenshots;
   - files on internal storage and the SD card;
